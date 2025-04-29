@@ -9,8 +9,6 @@ import org.operaton.bpm.engine.impl.ProcessEngineImpl;
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.operaton.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
-import org.operaton.bpm.engine.impl.util.ClockUtil;
-import org.operaton.bpm.engine.runtime.Job;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +52,6 @@ public class JobExecutorHelper {
 
     public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfigurationImpl processEngineConfiguration, long maxMillisToWait) {
         // Check interval configuration (deprecated and unused prior to migration)
-
         waitForJobExecutorToProcessAllJobs(processEngineConfiguration, maxMillisToWait, CHECK_INTERVAL_MS);
     }
 
@@ -104,16 +101,15 @@ public class JobExecutorHelper {
     }
 
     public static boolean areJobsAvailable(ManagementService managementService) {
-        return managementService.createJobQuery().list().stream().anyMatch(JobExecutorHelper::isJobAvailable);
-    }
-
-
-    public static boolean isJobAvailable(Job job) {
-        return job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()));
+        return numberOfJobsAvailable(managementService) > 0;      // Check if there are any matching jobs
     }
 
     public static long numberOfJobsAvailable(ManagementService managementService) {
-        return managementService.createJobQuery().list().stream().filter(JobExecutorHelper::isJobAvailable).count();
+        // Directly count the number of jobs that are available using the JobQuery interface
+        return managementService.createJobQuery()
+                .withRetriesLeft() // Select jobs with retries > 0
+                .executable()      // Ensure jobs are due (null or past due date)
+                .count();          // Efficiently count the jobs in the database
     }
 
     private static ManagementService getManagementService(ProcessEngineConfigurationImpl processEngineConfiguration) {

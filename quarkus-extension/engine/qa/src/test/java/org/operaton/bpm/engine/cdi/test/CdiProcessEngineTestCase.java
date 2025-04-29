@@ -35,7 +35,6 @@ import org.operaton.bpm.engine.RuntimeService;
 import org.operaton.bpm.engine.TaskService;
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.impl.test.TestHelper;
-import org.operaton.bpm.engine.test.util.JobExecutorHelper;
 import org.operaton.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.junit.After;
 import org.junit.Before;
@@ -149,10 +148,6 @@ public class CdiProcessEngineTestCase {
     if (resources != null) {
       deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, resources, testClass, methodName);
     }
-  }
-
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
-    JobExecutorHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, maxMillisToWait, intervalMillis);
   }
 
   @ApplicationScoped
