@@ -54,6 +54,7 @@ import org.operaton.bpm.engine.runtime.CaseInstance;
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
+import org.operaton.bpm.engine.test.util.JobExecutorHelper;
 import org.operaton.bpm.engine.variable.VariableMap;
 import org.operaton.bpm.model.bpmn.BpmnModelInstance;
 
@@ -213,29 +214,11 @@ public class ProcessEngineTestExtension
   }
 
   public void waitForJobExecutorToProcessAllJobs() {
-    waitForJobExecutorToProcessAllJobs(0);
+    JobExecutorHelper.waitForJobExecutorToProcessAllJobs((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration(), JobExecutorHelper.JOBS_WAIT_TIMEOUT_MS, 0L);
   }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-    long intervalMillis = 1000;
-
-    int jobExecutorWaitTime = jobExecutor.getWaitTimeInMillis() * 2;
-    if(maxMillisToWait < jobExecutorWaitTime) {
-      maxMillisToWait = jobExecutorWaitTime;
-    }
-
-    try {
-      await().pollDelay(intervalMillis, MILLISECONDS)
-              .atMost(maxMillisToWait, MILLISECONDS)
-              .until(() -> !areJobsAvailable());
-    } catch (ConditionTimeoutException e) {
-      throw new AssertionError("time limit of " + maxMillisToWait + " was exceeded. Jobs still running: " + availableJobs());
-    } finally {
-      jobExecutor.shutdown();
-    }
+    JobExecutorHelper.waitForJobExecutorToProcessAllJobs((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration(), maxMillisToWait, JobExecutorHelper.CHECK_INTERVAL_MS);
   }
 
   protected List<Job> availableJobs() {

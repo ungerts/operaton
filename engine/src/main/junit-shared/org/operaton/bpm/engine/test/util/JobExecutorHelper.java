@@ -100,6 +100,28 @@ public class JobExecutorHelper {
         }
     }
 
+    public static void waitForJobExecutorToProcessAllJobs(String processInstanceId, long maxMillisToWait, long checkInterval, JobExecutor jobExecutor,ManagementService managementService, boolean shutdown) {
+        try {
+            Callable<Boolean> condition = () -> !areJobsAvailable(processInstanceId ,managementService);
+            waitForCondition(condition,maxMillisToWait, checkInterval);
+        } catch (Exception e) {
+            throw new ProcessEngineException("Time limit of " + maxMillisToWait + " was exceeded.", e);
+        } finally {
+            if (shutdown) {
+                jobExecutor.shutdown();
+            }
+        }
+    }
+
+    private static boolean areJobsAvailable(String processInstanceId, ManagementService managementService) {
+        return managementService.createJobQuery()
+                .withRetriesLeft()
+                .executable()
+                .processInstanceId(processInstanceId)
+                .count() > 0;
+
+    }
+
     public static boolean areJobsAvailable(ManagementService managementService) {
         return numberOfJobsAvailable(managementService) > 0;      // Check if there are any matching jobs
     }
