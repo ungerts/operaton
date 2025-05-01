@@ -26,7 +26,7 @@ import static org.awaitility.Awaitility.await;
  */
 public class JobExecutorHelper {
 
-    public static final long CHECK_INTERVAL_MS = 1000L;
+    public static final long CHECK_INTERVAL_MS = 500L;
     public static final long JOBS_WAIT_TIMEOUT_MS = 20_000L;
     private static final int JOB_EXECUTOR_WAIT_MULTIPLIER = 2;
     private static final int THREAD_POOL_ACTIVE_COUNT_ZERO = 0;
@@ -117,6 +117,7 @@ public class JobExecutorHelper {
         return managementService.createJobQuery()
                 .withRetriesLeft()
                 .executable()
+                .active()
                 .processInstanceId(processInstanceId)
                 .count() > 0;
 
@@ -131,6 +132,7 @@ public class JobExecutorHelper {
         return managementService.createJobQuery()
                 .withRetriesLeft() // Select jobs with retries > 0
                 .executable()      // Ensure jobs are due (null or past due date)
+                .active()         // Ensure jobs are not suspended
                 .count();          // Efficiently count the jobs in the database
     }
 
