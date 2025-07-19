@@ -176,6 +176,7 @@ import org.operaton.bpm.model.bpmn.impl.instance.SourceRef;
 import org.operaton.bpm.model.bpmn.impl.instance.StartEventImpl;
 import org.operaton.bpm.model.bpmn.impl.instance.SubConversationImpl;
 import org.operaton.bpm.model.bpmn.impl.instance.SubProcessImpl;
+import org.operaton.bpm.model.bpmn.impl.instance.AdhocSubProcessImpl;
 import org.operaton.bpm.model.bpmn.impl.instance.SupportedInterfaceRef;
 import org.operaton.bpm.model.bpmn.impl.instance.Supports;
 import org.operaton.bpm.model.bpmn.impl.instance.Target;
@@ -596,6 +597,7 @@ public class Bpmn {
     StartEventImpl.registerType(bpmnModelBuilder);
     SubConversationImpl.registerType(bpmnModelBuilder);
     SubProcessImpl.registerType(bpmnModelBuilder);
+    AdhocSubProcessImpl.registerType(bpmnModelBuilder);
     SupportedInterfaceRef.registerType(bpmnModelBuilder);
     Supports.registerType(bpmnModelBuilder);
     Target.registerType(bpmnModelBuilder);

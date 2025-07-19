@@ -1437,7 +1437,9 @@ public class BpmnParse extends Parse {
       activity = parseEventBasedGateway(activityElement, parentElement, scopeElement);
     } else if (activityElement.getTagName().equals(ActivityTypes.TRANSACTION)) {
       activity = parseTransaction(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals(ActivityTypes.SUB_PROCESS_AD_HOC) || activityElement.getTagName().equals(ActivityTypes.GATEWAY_COMPLEX)) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.SUB_PROCESS_AD_HOC) ) {
+      activity = parseAdHocSubProcess(activityElement, scopeElement);
+    } else if (activityElement.getTagName().equals(ActivityTypes.GATEWAY_COMPLEX)) {
       addWarning("Ignoring unsupported activity type", activityElement);
     }
 
@@ -3888,7 +3890,7 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuationForActivity(subProcessElement, subProcessActivity);
 
-    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute("triggeredByEvent"), false);
+    boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute("triggeredByEvent"), false);
     subProcessActivity.getProperties().set(BpmnProperties.TRIGGERED_BY_EVENT, isTriggeredByEvent);
     subProcessActivity.setProperty(PROPERTYNAME_CONSUMES_COMPENSATION, !isTriggeredByEvent);
 
@@ -3905,6 +3907,11 @@ public class BpmnParse extends Parse {
       parseListener.parseSubProcess(subProcessElement, scope, subProcessActivity);
     }
     return subProcessActivity;
+  }
+
+  protected ActivityImpl parseAdHocSubProcess(Element adHocSubProcessElement, ScopeImpl scopeElement) {
+    addWarning("Ignoring unsupported activity type", adHocSubProcessElement);
+    return null;
   }
 
   protected ActivityImpl parseTransaction(Element transactionElement, ScopeImpl scope) {
