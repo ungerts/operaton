@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_InvalidStartEvent"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:process id="InvalidStartEventProcess" name="Invalid Start Event Process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_ToAdHoc</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:adHocSubProcess id="AdHoc_WithInvalidStartEvent" name="Ad-hoc with Invalid Start Event">
+      <bpmn:incoming>Flow_ToAdHoc</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToEnd</bpmn:outgoing>
+
+      <bpmn:startEvent id="StartEvent_InAdHoc" name="Invalid Start Event in Ad-hoc">
+        <bpmn:outgoing>Flow_StartToTask</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="Task1" name="Task 1">
+        <bpmn:incoming>Flow_StartToTask</bpmn:incoming>
+      </bpmn:userTask>
+
+      <bpmn:sequenceFlow id="Flow_StartToTask" sourceRef="StartEvent_InAdHoc" targetRef="Task1" />
+    </bpmn:adHocSubProcess>
+
+    <bpmn:sequenceFlow id="Flow_ToAdHoc" sourceRef="StartEvent_1" targetRef="AdHoc_WithInvalidStartEvent" />
+    <bpmn:endEvent id="EndEvent_1">
+      <bpmn:incoming>Flow_ToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_ToEnd" sourceRef="AdHoc_WithInvalidStartEvent" targetRef="EndEvent_1" />
+  </bpmn:process>
+
+</bpmn:definitions>

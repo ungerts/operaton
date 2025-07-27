@@ -16,6 +16,7 @@
  */
 package org.operaton.bpm.engine.impl.bpmn.parser;
 
+import java.util.Set;
 import org.operaton.bpm.engine.ActivityTypes;
 import org.operaton.bpm.engine.BpmnParseException;
 import org.operaton.bpm.engine.ProcessEngineException;
@@ -25,6 +26,7 @@ import org.operaton.bpm.engine.delegate.VariableListener;
 import org.operaton.bpm.engine.impl.Condition;
 import org.operaton.bpm.engine.impl.HistoryTimeToLiveParser;
 import org.operaton.bpm.engine.impl.ProcessEngineLogger;
+import org.operaton.bpm.engine.impl.bpmn.behavior.AdHocSubProcessActivityBehavior;
 import org.operaton.bpm.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
 import org.operaton.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.operaton.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
@@ -3910,8 +3912,70 @@ public class BpmnParse extends Parse {
   }
 
   protected ActivityImpl parseAdHocSubProcess(Element adHocSubProcessElement, ScopeImpl scopeElement) {
-    addWarning("Ignoring unsupported activity type", adHocSubProcessElement);
-    return null;
+    String elementId = adHocSubProcessElement.attribute("id");
+
+    // Search for start events
+    List<Element> startEvents = adHocSubProcessElement.elements("startEvent");
+    if (!startEvents.isEmpty()) {
+      addError("Ad-hoc subprocess cannot contain start events", adHocSubProcessElement, elementId);
+    }
+
+    // Search for end events
+    List<Element> endEvents = adHocSubProcessElement.elements("endEvent");
+    if (!endEvents.isEmpty()) {
+      addError("Ad-hoc subprocess cannot contain end events", adHocSubProcessElement, elementId);
+    }
+
+    // Empty ad-hoc subprocesses are not allowed
+    // Inconing and Outgoing sequence flows are allowed
+    if (adHocSubProcessElement.elements().stream().noneMatch(this::isFlowElement)) {
+      addError("Ad-hoc subprocess cannot be empty", adHocSubProcessElement, elementId);
+    }
+
+
+
+    ActivityImpl adHocSubProcessActivity = createActivityOnScope(adHocSubProcessElement, scopeElement);
+
+    // Mark it as a subprocess scope so it can properly handle sequence flows
+    adHocSubProcessActivity.setSubProcessScope(true);
+    adHocSubProcessActivity.setScope(true);
+
+    // TODO: Compensation handling for ad-hoc subprocesses is not yet implemented
+    // TODO: asynchronous continuation for ad-hoc subprocesses is not yet implemented
+    // TODO: Event handling for ad-hoc subprocesses is not yet implemented
+    // TODO: Multi-instance handling for ad-hoc subprocesses is not yet implemented
+    // TODO: error callback for ad-hoc subprocesses is not yet implemented
+    // TODO: parallel/sequential execution for ad-hoc subprocesses is not yet implemented
+
+    // Set a behavior that indicates this is an ad-hoc subprocess
+    // This could be a simple behavior that either:
+    // 1. Throws an unsupported operation exception at runtime
+    // 2. Implements basic ad-hoc logic
+    // 3. Falls back to regular subprocess behavior
+    adHocSubProcessActivity.setActivityBehavior(new AdHocSubProcessActivityBehavior());
+
+    // Mark it as ad-hoc for potential runtime differentiation
+    adHocSubProcessActivity.setProperty("isAdHoc", true);
+
+    // TODO: Parse inside of the ad-hoc subprocess properly
+    parseScope(adHocSubProcessElement, adHocSubProcessActivity);
+
+
+    return adHocSubProcessActivity;
+    //return parseSubProcess(adHocSubProcessElement, scopeElement);
+  }
+
+  private boolean isFlowElement(Element element) {
+    // Might not work for all BPMN elements, but should cover most common cases.
+    // Custom BPMN elements might need additional checks.
+    Set<String> flowElementTypes = Set.of(
+        "task", "userTask", "serviceTask", "scriptTask", "businessRuleTask",
+        "sendTask", "receiveTask", "manualTask", "callActivity", "subProcess",
+        "startEvent", "intermediateThrowEvent", "intermediateCatchEvent", "endEvent",
+        "exclusiveGateway", "inclusiveGateway", "parallelGateway", "eventBasedGateway",
+        "sequenceFlow"
+    );
+    return flowElementTypes.contains(element.getTagName());
   }
 
   protected ActivityImpl parseTransaction(Element transactionElement, ScopeImpl scope) {

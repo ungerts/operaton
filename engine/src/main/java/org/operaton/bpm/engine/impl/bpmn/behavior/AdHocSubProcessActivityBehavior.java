@@ -32,7 +32,8 @@ public class AdHocSubProcessActivityBehavior extends SubProcessActivityBehavior 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
     // Execute the ad-hoc sub process logic using standard subprocess behavior
-    super.execute(execution);
+    //super.execute(execution);
+    super.leave(execution);
   }
 
   @Override
@@ -66,4 +67,15 @@ public class AdHocSubProcessActivityBehavior extends SubProcessActivityBehavior 
     // For example: expressionManager.createExpression(completionCondition).getValue(execution)
     return true;
   }
+
+  // Optional: allow tasks to signal the ad hoc subprocess
+  @Override
+  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+    if ("tryComplete".equals(signalName)) {
+      leave(execution);
+    } else {
+      super.signal(execution, signalName, signalData);
+    }
+  }
+
 }

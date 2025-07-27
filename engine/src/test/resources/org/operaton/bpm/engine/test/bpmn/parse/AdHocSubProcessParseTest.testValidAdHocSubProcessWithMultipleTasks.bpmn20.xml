@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_MultiTaskAdHoc"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:process id="MultiTaskAdHocProcess" name="Multi Task Ad-hoc Process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_ToAdHoc</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:adHocSubProcess id="AdHoc_MultiTask" name="Ad-hoc with Multiple Tasks">
+      <bpmn:incoming>Flow_ToAdHoc</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToEnd</bpmn:outgoing>
+
+      <bpmn:userTask id="Task1" name="Submit Request" />
+      <bpmn:userTask id="Task2" name="Review Request" />
+      <bpmn:userTask id="Task3" name="Approve Request" />
+      <bpmn:serviceTask id="Task4" name="Send Notification" />
+    </bpmn:adHocSubProcess>
+
+    <bpmn:sequenceFlow id="Flow_ToAdHoc" sourceRef="StartEvent_1" targetRef="AdHoc_MultiTask" />
+    <bpmn:endEvent id="EndEvent_1">
+      <bpmn:incoming>Flow_ToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_ToEnd" sourceRef="AdHoc_MultiTask" targetRef="EndEvent_1" />
+  </bpmn:process>
+
+</bpmn:definitions>
