@@ -59,6 +59,7 @@ import org.operaton.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.operaton.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.operaton.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.operaton.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
+import org.operaton.bpm.engine.impl.interceptor.CommandContext;
 import org.operaton.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.operaton.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.operaton.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
@@ -68,6 +69,7 @@ import org.operaton.bpm.engine.impl.persistence.entity.HistoricVariableInstanceE
 import org.operaton.bpm.engine.impl.persistence.entity.JobEntity;
 import org.operaton.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.operaton.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.operaton.bpm.engine.impl.util.EnsureUtil;
 import org.operaton.bpm.engine.repository.CaseDefinition;
 import org.operaton.bpm.engine.repository.DecisionDefinition;
 import org.operaton.bpm.engine.repository.ProcessDefinition;
@@ -961,19 +963,25 @@ public class AuthorizationCommandChecker implements CommandChecker {
   // helper ////////////////////////////////////////
 
   protected AuthorizationManager getAuthorizationManager() {
-    return Context.getCommandContext().getAuthorizationManager();
+    return getCommandContext().getAuthorizationManager();
   }
 
   protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
-    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+    return getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
   }
 
   protected DecisionDefinitionEntity findLatestDecisionDefinitionById(String decisionDefinitionId) {
-    return Context.getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
+    return getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
   }
 
   protected ExecutionEntity findExecutionById(String processInstanceId) {
-    return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+    return getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+  }
+
+  private static CommandContext getCommandContext() {
+    CommandContext commandContext = Context.getCommandContext();
+    EnsureUtil.ensureNotNull("commandContext", commandContext);
+    return commandContext;
   }
 
 }

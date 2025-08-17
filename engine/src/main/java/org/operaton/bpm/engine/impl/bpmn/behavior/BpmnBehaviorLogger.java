@@ -283,4 +283,84 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
         escalationCode));
   }
 
+  // Ad-hoc subprocess specific log methods
+  public void adHocSubprocessCompletionConditionEvaluationFailed(String activityId, Throwable cause) {
+    logWarn(
+      "044",
+      "Failed to evaluate completion condition for ad-hoc subprocess with id '{}': {}",
+      activityId,
+      cause.getMessage(),
+      cause
+    );
+  }
+
+  public void adHocSubprocessSignalFailed(String activityId, String signalName, Throwable cause) {
+    logWarn(
+      "045",
+      "Failed to handle signal '{}' for ad-hoc subprocess with id '{}': {}",
+      signalName,
+      activityId,
+      cause.getMessage(),
+      cause
+    );
+  }
+
+  public void adHocSubprocessChildExecutionEndFailed(String activityId, Throwable cause) {
+    logWarn(
+      "046",
+      "Failed to handle concurrent child execution end for ad-hoc subprocess with id '{}': {}",
+      activityId,
+      cause.getMessage(),
+      cause
+    );
+  }
+
+  public void adHocSubprocessLeaveFailed(String activityId, Throwable cause) {
+    logWarn(
+      "047",
+      "Failed to leave ad-hoc subprocess with id '{}': {}",
+      activityId,
+      cause.getMessage(),
+      cause
+    );
+  }
+
+  public void adHocSubprocessCompensationNotAvailable(String activityId, String executionType) {
+    logWarn(
+      "074",
+      "Cannot create event scope execution for compensation in ad-hoc subprocess with id '{}': execution is not an ExecutionEntity instance but {}",
+      activityId,
+      executionType
+    );
+  }
+
+  public void adHocSubprocessTerminatingChildExecution(String childExecutionId, String subprocessId) {
+    logDebug(
+      "075",
+      "Terminating active child execution '{}' in ad-hoc subprocess '{}' due to completion condition",
+      childExecutionId,
+      subprocessId
+    );
+  }
+
+  public void adHocSubprocessGracefulTerminationFailed(String childExecutionId, Throwable cause) {
+    logWarn(
+      "076",
+      "Failed to gracefully terminate child execution '{}', forcing removal: {}",
+      childExecutionId,
+      cause.getMessage(),
+      cause
+    );
+  }
+
+  public void adHocSubprocessTerminationFailed(String subprocessId, Throwable cause) {
+    logWarn(
+      "077",
+      "Failed to terminate active child executions in ad-hoc subprocess '{}': {}",
+      subprocessId,
+      cause.getMessage(),
+      cause
+    );
+  }
+
 }

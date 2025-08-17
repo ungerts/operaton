@@ -19,6 +19,7 @@ package org.operaton.bpm.engine.impl.util;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.operaton.bpm.engine.ProcessEngineConfiguration;

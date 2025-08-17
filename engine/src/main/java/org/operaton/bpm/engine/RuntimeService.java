@@ -2416,4 +2416,14 @@ public interface RuntimeService {
    */
   ConditionEvaluationBuilder createConditionEvaluation();
 
+  /**
+   * Retrieves a list of available activities within an ad-hoc subprocess for a given execution.
+   *
+   * @param executionId the unique identifier of the execution context within the ad-hoc subprocess
+   * @return a list of activity names that are available within the specified ad-hoc subprocess
+   */
+  List<String> getAvailableActivitiesInAdHocSubProcess(String executionId);
+
+  void startActivityInAdHocSubProcess(String executionId, String activityId);
+
 }

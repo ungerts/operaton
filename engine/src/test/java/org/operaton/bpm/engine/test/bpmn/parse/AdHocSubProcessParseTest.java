@@ -16,6 +16,8 @@ import org.operaton.bpm.engine.RuntimeService;
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.impl.test.TestHelper;
 import org.operaton.bpm.engine.repository.ProcessDefinition;
+import org.operaton.bpm.engine.runtime.Execution;
+import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.test.Deployment;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineTestExtension;
@@ -96,6 +98,13 @@ class AdHocSubProcessParseTest {
 
     assertThat(processDefinition).as("Process definition should be deployed").isNotNull();
     assertThat(processDefinition.getKey()).as("Process definition key should match").isEqualTo("ValidAdHocProcess");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    assertThat(processInstance).as("Process instance should be created").isNotNull();
+    assertThat(processInstance.isEnded()).as("Process instance should not be ended").isFalse();
+    Execution execution = runtimeService.createExecutionQuery().activityId("AdHoc_Valid").singleResult();
+    assertThat(execution).as("Execution for ad-hoc subprocess should exist").isNotNull();
+    List<String> activityIds = runtimeService.getAvailableActivitiesInAdHocSubProcess(execution.getId());
+    assertThat(activityIds).as("Available activities in ad-hoc subprocess should match").containsExactlyInAnyOrder("Task1", "Task2");
   }
 
   @Test

@@ -34,6 +34,7 @@ import org.operaton.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.operaton.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
 import org.operaton.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.operaton.bpm.engine.impl.cmd.GetActivityInstanceCmd;
+import org.operaton.bpm.engine.impl.cmd.GetAvailableActivitiesInAdHocSubProcessCmd;
 import org.operaton.bpm.engine.impl.cmd.GetExecutionVariableCmd;
 import org.operaton.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
 import org.operaton.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
@@ -45,6 +46,7 @@ import org.operaton.bpm.engine.impl.cmd.ResolveIncidentCmd;
 import org.operaton.bpm.engine.impl.cmd.SetAnnotationForIncidentCmd;
 import org.operaton.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.operaton.bpm.engine.impl.cmd.SignalCmd;
+import org.operaton.bpm.engine.impl.cmd.StartActivityInAdHocSubProcessCmd;
 import org.operaton.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
 import org.operaton.bpm.engine.impl.cmd.batch.variables.SetVariablesToProcessInstancesBatchCmd;
 import org.operaton.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
@@ -828,5 +830,18 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   @Override
   public ConditionEvaluationBuilder createConditionEvaluation() {
     return new ConditionEvaluationBuilderImpl(commandExecutor);
+  }
+
+  @Override
+  public List<String> getAvailableActivitiesInAdHocSubProcess(String executionId) {
+    if (executionId == null) {
+      throw new BadUserRequestException("executionId cannot be null");
+    }
+    return commandExecutor.execute(new GetAvailableActivitiesInAdHocSubProcessCmd(executionId));
+  }
+
+  @Override
+  public void startActivityInAdHocSubProcess(String executionId, String activityId) {
+    commandExecutor.execute(new StartActivityInAdHocSubProcessCmd(executionId, activityId));
   }
 }
